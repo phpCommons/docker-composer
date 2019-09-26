@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+docker run -it -v $PWD:/app composer "${@:1}"
+rooted=`ls -lG |grep root | awk '{print $NF}'`
+list=`echo -e "\e[38;5;1m["$rooted"]\e[0m" | sed "s/ /, /g"`
+echo "Found root files & directories: $list"
+for i in $rooted
+do
+	sudo chown -R $USER:$USER $i
+done
+list=`echo -e "\e[38;5;82m["$rooted"]\e[0m" | sed "s/ /, /g"`
+echo "Files & directories changed owner: $list"
