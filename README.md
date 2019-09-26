@@ -18,8 +18,9 @@ Automation install `composer` bash script to `/usr/bin/` or `/usr/local/bin/`  w
 3. Run `chmod +x` on `/usr/bin/composer` or `/usr/local/bin/composer`
 
 Optional:
-4. If you don't want always passing your password for `sudo` command. Edit `/etc/sudoers` file by `visudo` command 
-5. Add your user `youruser ALL=(ALL) NOPASSWD: /usr/bin/chown*,/usr/bin/composer*,/usr/bin/chown`
+
+1. If you don't want always passing your password for `sudo` command. Edit `/etc/sudoers` file by `visudo` command 
+2. Add your user `youruser ALL=(ALL) NOPASSWD: /usr/bin/chown*,/usr/bin/composer*,/usr/bin/chown`
 
 Attention!!!
 Please be sure, that your `/etc/sudoers` file does not contains any exclutions or colisions from your groups like:
