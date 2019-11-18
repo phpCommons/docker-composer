@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+parse_yaml() {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
+}
+
+log() {
+  logger --no-act -s "$1" 2>&1 | sed 's/^<[0-9]\+>//' >> /tmp/composer.log
+}
+
+if [ ! -f composer.yaml ]; then
+   echo -e "\e[38;5;37mCommand definition in file \e[38;5;11m'composer.yaml'\e[38;5;37m not found for current path. Using \e[38;5;11m'composer:latest'\e[38;5;37m image.\e[0m"
+   echo -e "\e[38;5;37mAdvice: plase create \e[38;5;11m'composer.yaml'\e[38;5;37m file with definition \e[38;5;78m{ \e[38;5;166mimage:\e[0m your-image:tagged \e[38;5;78m} \e[38;5;37min your project directory \e[0m"
+   export image="composer:latest"
+else
+  eval $(parse_yaml composer.yaml "")
+fi
+
+container="image"
+docker run -it -v $PWD:/app -v /tmp/auth.json:/tmp/auth.json ${!container} "${@:1}"
+
+rooted=`ls -lRG |grep root | awk '{print $NF}'`
+list=`echo -e "\e[38;5;196m["$rooted"]\e[0m" | sed "s/ /, /g"`
+log "Found root files & directories: $list"
+if [[ ! -z "$rooted" ]]; then
+	sudo chown -R $USER:$USER .
+	list=`echo -e "\e[38;5;82m["$rooted"]\e[0m" | sed "s/ /, /g"`
+	log "Files & directories changed owner: $list"
+fi

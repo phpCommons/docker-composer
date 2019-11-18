@@ -40,4 +40,9 @@ Go to your PHP project **without** composer.json and call to check your installa
 composer init
 ```
 
+# \[Attention!!!\] `composer.yaml` file
+```YAML
+image: composer:latest
+```
+
 [<< previous](../README.md)
